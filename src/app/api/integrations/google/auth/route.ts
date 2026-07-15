@@ -1,15 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { getBaseUrl } from '@/lib/baseUrl';
-<<<<<<< HEAD
-=======
 
->>>>>>> 70719138e9d3947d50f208fd8eeb8c79bec4aaa1
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const action = searchParams.get('action') || 'link'; // 'login' or 'link'
 
   const sessionCookie = req.cookies.get('vd_session');
-  
+
   // If linking calendar, require session
   if (action === 'link' && !sessionCookie) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -17,11 +14,7 @@ export async function GET(req: NextRequest) {
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-<<<<<<< HEAD
-  const origin = getBaseUrl(req); 
-=======
   const origin = getBaseUrl(req);
->>>>>>> 70719138e9d3947d50f208fd8eeb8c79bec4aaa1
   const redirectUri = `${origin}/api/integrations/google/callback`;
 
   // Encode action and session context into state parameter
@@ -49,7 +42,7 @@ export async function GET(req: NextRequest) {
       'https://www.googleapis.com/auth/calendar',
       'https://www.googleapis.com/auth/calendar.events'
     ];
-  
+
   const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${encodeURIComponent(clientId)}&` +
     `redirect_uri=${encodeURIComponent(redirectUri)}&` +
