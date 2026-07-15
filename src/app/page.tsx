@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Mail,
   Lock,
-  Sparkles,
   ChevronRight,
   RefreshCw,
   Eye,
@@ -96,16 +95,6 @@ function LoginContent() {
 
   const handleGoogleLogin = () => {
     window.location.href = '/api/integrations/google/auth?action=login';
-  };
-
-  const fillCredentials = (role: 'admin' | 'member') => {
-    if (role === 'admin') {
-      setEmail('ramyaa1304@gmail.com');
-      setPassword('admin123');
-    } else {
-      setEmail('elena@saraban.com');
-      setPassword('member123');
-    }
   };
 
   return (
@@ -264,30 +253,6 @@ function LoginContent() {
             Sign In with Google
           </button>
 
-          {/* Instant Demo Logins */}
-          <div className="pt-5 border-t border-gray-200 space-y-3">
-            <span className="block text-[10px] text-center text-gray-500 font-semibold uppercase tracking-wider">
-              Instant Demo Logins
-            </span>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => fillCredentials('admin')}
-                className="bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-primary/30 transition-all rounded-lg py-2 text-[10px] font-bold flex items-center justify-center gap-1.5 text-gray-700"
-              >
-                <Sparkles size={11} className="text-primary" />
-                Ramya (Admin)
-              </button>
-              <button
-                type="button"
-                onClick={() => fillCredentials('member')}
-                className="bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-secondary/30 transition-all rounded-lg py-2 text-[10px] font-bold flex items-center justify-center gap-1.5 text-gray-700"
-              >
-                <Sparkles size={11} className="text-secondary" />
-                Elena (Member)
-              </button>
-            </div>
-          </div>
         </form>
       )}
 

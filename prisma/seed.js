@@ -25,14 +25,14 @@ async function main() {
       role: 'ADMIN',
       status: 'ACTIVE',
       emailVerified: true,
-      mustChangePassword: true,
+      mustChangePassword: false,
     },
   });
 
   const member = await prisma.user.create({
     data: {
       name: 'Elena Rostova',
-      email: 'elena@visualdrift.com',
+      email: 'elena@saraban.com',
       passwordHash: memberHash,
       role: 'MEMBER',
       status: 'ACTIVE',
