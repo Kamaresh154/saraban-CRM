@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = `${req.nextUrl.origin}/api/integrations/google/callback`;
+  const redirectUri = `${getBaseUrl(req)}/api/integrations/google/callback`;
 
   let accessToken = 'mock_google_access_token_xyz_9988';
   let refreshToken = 'mock_google_refresh_token_abc_7766';
