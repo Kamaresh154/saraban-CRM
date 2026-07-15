@@ -1,0 +1,153 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                 String         @id @default(uuid())
+  email              String         @unique
+  passwordHash       String
+  name               String
+  phoneNumber        String?
+  department         String?
+  role               String         @default("MEMBER") // "ADMIN" or "MEMBER"
+  status             String         @default("ACTIVE") // "ACTIVE" or "INACTIVE"
+  googleId           String?        @unique
+  emailVerified      Boolean        @default(false)
+  mustChangePassword Boolean        @default(false)
+  failedAttempts     Int            @default(0)
+  lockoutUntil       DateTime?
+  verificationToken  String?
+  resetToken         String?
+  resetTokenExpires  DateTime?
+  assignedLeads      Lead[]         @relation("AssignedLeads")
+  createdLeads       Lead[]         @relation("CreatedLeads")
+  followUps          FollowUp[]
+  activities         Activity[]
+  notes              Note[]
+  attachments        Attachment[]
+  calendarSyncs      CalendarSync[]
+  savedFilters       SavedFilter[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+}
+
+model Lead {
+  id                 String       @id @default(uuid())
+  name               String
+  companyName        String?
+  contactPerson      String
+  email              String
+  phone              String?
+  whatsapp           String?
+  website            String?
+  address            String?
+  country            String?
+  industry           String?
+  source             String
+  service            String       // "XR", "AI", "MARKETING", "WEB_DEV", "CREATIVE", "OTHER"
+  estimatedBudget    Float?
+  expectedStartDate  DateTime?
+  priority           String       @default("MEDIUM") // "LOW", "MEDIUM", "HIGH", "URGENT"
+  status             String       @default("NEW") // "NEW", "CONTACTED", "FOLLOW_UP_SCHEDULED", "PROPOSAL_SENT", "NEGOTIATION", "WON", "LOST", "ON_HOLD"
+  assignedToId       String?
+  assignedTo         User?        @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdById        String
+  createdBy          User         @relation("CreatedLeads", fields: [createdById], references: [id])
+  tags               String?      // Comma-separated values for SQLite compatibility (e.g. "xr,ai")
+  internalNotes      String?
+  isArchived         Boolean      @default(false)
+  followUps          FollowUp[]
+  activities         Activity[]
+  notes              Note[]
+  attachments        Attachment[]
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+}
+
+model FollowUp {
+  id             String         @id @default(uuid())
+  leadId         String
+  lead           Lead           @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  assignedToId   String
+  assignedTo     User           @relation(fields: [assignedToId], references: [id], onDelete: Cascade)
+  type           String         // "PHONE_CALL", "WHATSAPP", "EMAIL", "ZOOM", "IN_PERSON", "PROPOSAL_REVIEW", "CUSTOM"
+  scheduledAt    DateTime
+  reminderTiming String         @default("AT_TIME") // "AT_TIME", "15M_BEFORE", "1H_BEFORE", "1D_BEFORE"
+  priority       String         @default("MEDIUM") // "LOW", "MEDIUM", "HIGH", "URGENT"
+  status         String         @default("PENDING") // "PENDING", "COMPLETED", "OVERDUE", "CANCELLED"
+  note           String?
+  reminderSent   Boolean        @default(false)
+  isRecurring    Boolean        @default(false)
+  recurrence     String?        // Recurrence settings as JSON-stringified object
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model Activity {
+  id          String       @id @default(uuid())
+  leadId      String?
+  lead        Lead?        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+  type        String       // "LEAD_CREATED", "EMAIL_SENT", "CALL_COMPLETED", "FOLLOW_UP_SCHEDULED", "MEETING_CONDUCTED", "NOTE_ADDED", "STATUS_CHANGED", "ATTACHMENT_UPLOADED"
+  description String
+  metadata    String?      // Optional metadata stored as JSON string
+  createdAt   DateTime     @default(now())
+}
+
+model Note {
+  id          String   @id @default(uuid())
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Attachment {
+  id           String   @id @default(uuid())
+  leadId       String
+  lead         Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  uploadedById String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  fileName     String
+  fileKey      String   // S3/Cloudinary/Local mock path identifier
+  fileUrl      String
+  fileType     String
+  fileSize     Int
+  createdAt    DateTime @default(now())
+}
+
+model CalendarSync {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider       String   // "GOOGLE" or "OUTLOOK"
+  accessToken    String
+  refreshToken   String
+  expiresAt      DateTime
+  connectedEmail String?
+  scope          String?
+  syncToken      String?
+  lastSyncedAt   DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, provider])
+}
+
+model SavedFilter {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  filters   String   // JSON string of active filtering parameters
+  createdAt DateTime @default(now())
+}
