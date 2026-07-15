@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { hashPassword } from '@/lib/hash';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
     });
 
     // 6. Return registration result & simulated token for local evaluation
-    const verifyLink = `${req.nextUrl.origin}/api/auth/verify?token=${token}`;
+    const verifyLink = `${getBaseUrl(req)}/api/auth/verify?token=${token}`;
 
     return NextResponse.json({
       success: true,
@@ -57,3 +58,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Registration failed due to server error' }, { status: 500 });
   }
 }
+
+

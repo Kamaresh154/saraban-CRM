@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { encrypt } from '@/lib/crypto';
 import { getBaseUrl } from '@/lib/baseUrl';
@@ -27,11 +27,11 @@ export async function GET(req: NextRequest) {
   const userId = stateUserId || sessionCookie?.value;
 
   if (action === 'link' && !userId) {
-    return NextResponse.redirect(`${req.nextUrl.origin}/calendar?sync=error&message=Session_expired`);
+    return NextResponse.redirect(`${getBaseUrl(req)}/calendar?sync=error&message=Session_expired`);
   }
 
   if (!code) {
-    return NextResponse.redirect(`${req.nextUrl.origin}/?error=No_oauth_code_provided`);
+    return NextResponse.redirect(`${getBaseUrl(req)}/?error=No_oauth_code_provided`);
   }
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
       if (!tokenRes.ok) {
         const errDetails = await tokenRes.text();
         console.error('Google OAuth token swap failed:', errDetails);
-        return NextResponse.redirect(`${req.nextUrl.origin}/?error=Token_swap_failed`);
+        return NextResponse.redirect(`${getBaseUrl(req)}/?error=Token_swap_failed`);
       }
 
       const tokenData = await tokenRes.json();
@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
       expiresAt = new Date(Date.now() + tokenData.expires_in * 1000);
     } catch (err) {
       console.error('Google OAuth exchange error:', err);
-      return NextResponse.redirect(`${req.nextUrl.origin}/?error=OAuth_exchange_error`);
+      return NextResponse.redirect(`${getBaseUrl(req)}/?error=OAuth_exchange_error`);
     }
   }
 
@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
     } catch (err) {
       console.error('Failed to fetch Google profile info:', err);
       if (action === 'login') {
-        return NextResponse.redirect(`${req.nextUrl.origin}/?error=Google_profile_fetch_failed`);
+        return NextResponse.redirect(`${getBaseUrl(req)}/?error=Google_profile_fetch_failed`);
       }
     }
   }
@@ -148,7 +148,7 @@ export async function GET(req: NextRequest) {
       }
 
       // Set cookie and redirect to dashboard
-      const response = NextResponse.redirect(`${req.nextUrl.origin}/dashboard`);
+      const response = NextResponse.redirect(`${getBaseUrl(req)}/dashboard`);
       response.cookies.set('vd_session', user.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -160,7 +160,7 @@ export async function GET(req: NextRequest) {
       return response;
     } catch (err) {
       console.error('Google login database error:', err);
-      return NextResponse.redirect(`${req.nextUrl.origin}/?error=Database_oauth_login_failed`);
+      return NextResponse.redirect(`${getBaseUrl(req)}/?error=Database_oauth_login_failed`);
     }
   }
 
@@ -191,9 +191,10 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.redirect(`${req.nextUrl.origin}/calendar?sync=success`);
+    return NextResponse.redirect(`${getBaseUrl(req)}/calendar?sync=success`);
   } catch (error) {
     console.error('Google Callback sync database save error:', error);
-    return NextResponse.redirect(`${req.nextUrl.origin}/calendar?sync=error&message=Database_error`);
+    return NextResponse.redirect(`${getBaseUrl(req)}/calendar?sync=error&message=Database_error`);
   }
 }
+

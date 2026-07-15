@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const token = searchParams.get('token');
 
   if (!token) {
-    return NextResponse.redirect(`${req.nextUrl.origin}/?verify=error&message=Missing_token`);
+    return NextResponse.redirect(`${getBaseUrl(req)}/?verify=error&message=Missing_token`);
   }
 
   try {
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.redirect(`${req.nextUrl.origin}/?verify=error&message=Invalid_or_expired_token`);
+      return NextResponse.redirect(`${getBaseUrl(req)}/?verify=error&message=Invalid_or_expired_token`);
     }
 
     // Verify User Email
@@ -27,9 +28,11 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.redirect(`${req.nextUrl.origin}/?verify=success`);
+    return NextResponse.redirect(`${getBaseUrl(req)}/?verify=success`);
   } catch (error) {
     console.error('Email verification callback error:', error);
-    return NextResponse.redirect(`${req.nextUrl.origin}/?verify=error&message=Server_error`);
+    return NextResponse.redirect(`${getBaseUrl(req)}/?verify=error&message=Server_error`);
   }
 }
+
+
