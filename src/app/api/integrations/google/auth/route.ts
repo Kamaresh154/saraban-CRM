@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
+import { getBaseUrl } from '@/lib/baseUrl';
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const action = searchParams.get('action') || 'link'; // 'login' or 'link'
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const origin = req.nextUrl.origin;
+  const origin = getBaseUrl(req); 
   const redirectUri = `${origin}/api/integrations/google/callback`;
 
   // Encode action and session context into state parameter
