@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 
+<<<<<<< HEAD
 
 /**
  * Returns the correct base URL for building redirect URIs (e.g. for Google OAuth).
@@ -22,3 +23,12 @@ export function getBaseUrl(req: NextRequest): string {
   }
   return req.nextUrl.origin;
 }
+=======
+export function getBaseUrl(req: NextRequest): string {
+  const configured = process.env.APP_URL;
+  if (configured) {
+    return configured.replace(/\/+$/, '');
+  }
+  return req.nextUrl.origin;
+}
+>>>>>>> 70719138e9d3947d50f208fd8eeb8c79bec4aaa1

@@ -1,8 +1,15 @@
 datasource db {
+<<<<<<< HEAD
      provider  = "postgresql"
      url       = env("DATABASE_URL")
      directUrl = env("DIRECT_URL")
    }
+=======
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+>>>>>>> 70719138e9d3947d50f208fd8eeb8c79bec4aaa1
 
 generator client {
   provider = "prisma-client-js"
